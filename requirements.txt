@@ -1,0 +1,18 @@
+# Core ML
+sentence-transformers>=2.2.0
+openai>=1.0.0
+
+# Vector Search
+faiss-cpu>=1.7.4
+rank-bm25>=0.2.2
+
+# Web Framework
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+
+# UI
+streamlit>=1.28.0
+
+# Utilities
+numpy>=1.24.0
