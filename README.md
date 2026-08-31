@@ -8,6 +8,14 @@
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="License">
 </p>
 
+<p align="center">
+  <img src="screenshots/ui.png" alt="Finance Invoice Q&A Bot UI" width="800">
+</p>
+
+<p align="center">
+  <a href="#quick-start"><img src="https://img.shields.io/badge/▶_Run_Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Run Streamlit"></a>
+</p>
+
 ---
 
 ## Why This Exists
