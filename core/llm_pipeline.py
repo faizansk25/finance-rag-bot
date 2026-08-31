@@ -194,7 +194,8 @@ ANSWER:"""
 
         return f"Error: LLM call failed after retries. {type(last_error).__name__}: {last_error}"
 
-    def format_for_voice(self, text: str) -> str:"""Format text for text-to-speech output.
+    def format_for_voice(self, text: str) -> str:
+        """Format text for text-to-speech output.
 
         Voice-specific rules:
         - Replace abbreviations: AP → "accounts payable"
