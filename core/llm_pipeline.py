@@ -153,23 +153,46 @@ ANSWER:"""
         return self._call_llm(prompt)
 
     def _call_llm(self, prompt: str) -> str:
-        """Call the OpenAI API.
-        
-        ponytail: temperature=0.1 for factual answers, max_tokens=1000.
-        Upgrade: add streaming, retry with backoff, model fallback.
-        """
-        try:
-            import openai
-            client = openai.OpenAI(api_key=self.api_key)
-            response = client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,  # Low temperature for factual answers
-                max_tokens=1000,
-            )
-            return response.choices[0].message.content.strip()
-        except Exception as e:
-            return f"Error calling LLM: {str(e)}"
+        """Call the OpenAI API with retry and proper error handling."""
+        import logging
+        logger = logging.getLogger(__name__)
+
+        if not self.api_key:
+            logger.error("OPENAI_API_KEY not set")
+            return "Error: OpenAI API key not configured. Set OPENAI_API_KEY environment variable."
+
+        last_error = None
+        for attempt in range(3):
+            try:
+                import openai
+                client = openai.OpenAI(api_key=self.api_key)
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.1,
+                    max_tokens=1000,
+                )
+                return response.choices[0].message.content.strip()
+            except openai.RateLimitError as e:
+                last_error = e
+                logger.warning(f"Rate limited (attempt {attempt+1}/3): {e}")
+                import time
+                time.sleep(2 ** attempt)
+            except openai.APIConnectionError as e:
+                last_error = e
+                logger.warning(f"Connection error (attempt {attempt+1}/3): {e}")
+                import time
+                time.sleep(1)
+            except openai.APIError as e:
+                last_error = e
+                logger.error(f"OpenAI API error: {e}")
+                break
+            except Exception as e:
+                last_error = e
+                logger.error(f"Unexpected error calling LLM: {type(e).__name__}: {e}")
+                break
+
+        return f"Error: LLM call failed after retries. {type(last_error).__name__}: {last_error}"
 
     def format_for_voice(self, text: str) -> str:"""Format text for text-to-speech output.
 
